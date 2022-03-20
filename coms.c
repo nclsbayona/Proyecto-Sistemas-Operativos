@@ -18,8 +18,8 @@ struct CommunicationSystem *createCommunicationSystem(){
 void addNewsArticle(struct CommunicationSystem *cs, char category, char *text){
     struct NewsArticle *article = createNewsArticle(category, text);
     if (cs->len++ > 0)
-        cs->articles = realloc(cs->articles, sizeof(struct NewsArticle) * cs->len);
+        cs->articles = realloc(cs->articles, sizeof(struct NewsArticle*) * cs->len);
     else
-        cs->articles = malloc(sizeof(struct NewsArticle));
+        cs->articles = malloc(sizeof(struct NewsArticle*));
     cs->articles[cs->len - 1] = article;
 }
