@@ -23,3 +23,7 @@ void addNewsArticle(struct CommunicationSystem *cs, char category, char *text){
         cs->articles = malloc(sizeof(struct NewsArticle*));
     cs->articles[cs->len - 1] = article;
 }
+
+void subscribeToTopic(struct CommunicationSystem *cs, char key, char *filename){
+    subscribeToEntry(cs->writingPipes, key, filename);
+}
