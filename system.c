@@ -53,8 +53,7 @@ void readArticle(){
     free(article);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
     startSystem(argc, argv);
     cs=createCommunicationSystem();
     printf(" -p %s\n", with_publishers);
