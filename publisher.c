@@ -11,13 +11,14 @@
 char *with_system;
 char *archive;
 int time;
+mode_t fifo_mode= S_IRUSR | S_IWUSR;
 
 bool writeArticle(struct NewsArticle *article, char *filename)
 {
     int fd, close_status;
     do
     {
-        fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+        fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, fifo_mode);
         if (fd == -1)
         {
             perror("Error abriendo el pipe");
@@ -75,6 +76,7 @@ void readArticles()
 
 void startSystem(int argc, char **argv)
 {
+    int pipe=mkfifo(with_system, fifo_mode);
     for (int i = 1; i < argc; i += 2)
     {
         if (strcmp(argv[i], "-p") == 0)
