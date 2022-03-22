@@ -101,6 +101,14 @@ bool createArticle(char category, char *text)
     }
 }
 
+void exit(){
+    unlink (with_system);
+    remove (archive);
+    free(with_system);
+    free(archive);
+    exit(0);
+}
+
 int main(int argc, char **argv)
 {
     startSystem(argc, argv);

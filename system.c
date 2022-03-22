@@ -53,6 +53,14 @@ void readArticle(){
     free(article);
 }
 
+void exit(){
+    unlink(with_publishers);
+    unlink (with_subscriptors);
+    free(with_publishers);
+    free(with_subscriptors);
+    free(cs);
+}
+
 int main(int argc, char **argv){
     startSystem(argc, argv);
     cs=createCommunicationSystem();

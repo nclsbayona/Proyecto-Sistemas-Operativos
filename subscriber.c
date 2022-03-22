@@ -59,6 +59,11 @@ void fetchNew()
     }
 }
 
+void exit(){
+    unlink(with_system);
+    free(with_system);
+}
+
 int main(int argc, char **argv)
 {
     startSystem(argc, argv);
