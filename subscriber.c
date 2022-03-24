@@ -1,6 +1,8 @@
 #include "coms.c"
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
 char *with_system;
 
 void printArticle(struct NewsArticle *article)
@@ -24,15 +26,18 @@ struct NewsArticle *readArticle()
         fd = open(with_system, O_RDONLY);
         if (fd == -1)
         {
-            const int time = 10;
+            const int time = 5;
             perror("Error abriendo el pipe");
             printf("Se volvera a intentar\n");
             sleep(time);
         }
         else
         {
+            printf("Reading article\n");
             article = malloc(sizeof(struct NewsArticle));
             read(fd, article, sizeof(struct NewsArticle));
+            printf("Article read\n");
+            printArticle(article);
             do
             {
                 close_status = close(fd);
@@ -50,23 +55,24 @@ struct NewsArticle *readArticle()
 
 void fetchNew()
 {
-    while (true)
-    {
-        struct NewsArticle *article = readArticle(with_system);
-        if (article != NULL)
-            printArticle(article);
-        free(article);
+    printf ("Fetching new articles...\n");
+    int i=0;
+    while (i++<=3){
+    struct NewsArticle *article = readArticle(with_system);
+    if (article != NULL)
+        printArticle(article);
+    free(article);
     }
 }
 
-void exit(){
-    unlink(with_system);
-    free(with_system);
+void end(){
+    exit(0);
 }
 
 int main(int argc, char **argv)
 {
     startSystem(argc, argv);
     fetchNew();
+    end();
     return 0;
 }

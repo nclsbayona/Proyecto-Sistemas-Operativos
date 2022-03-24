@@ -11,7 +11,13 @@
 char *with_system;
 char *archive;
 int time;
-mode_t fifo_mode= S_IRUSR | S_IWUSR;
+mode_t fifo_mode = S_IRUSR | S_IWUSR;
+
+void createFile(char *name)
+{
+    int fd = open(name, O_RDWR | O_CREAT, fifo_mode);
+    close(fd);
+}
 
 bool writeArticle(struct NewsArticle *article, char *filename)
 {
@@ -44,47 +50,45 @@ bool writeArticle(struct NewsArticle *article, char *filename)
 
 void readArticles()
 {
-    FILE *fd;
-    while (true)
+    FILE *fd = NULL;
+    do
     {
-        do
+        fd = fopen(archive, "r");
+        if (fd == NULL)
         {
-            fd = fopen(archive, "r");
-            if (fd == NULL)
-            {
-                perror("Error abriendo el archivo para leer");
-                printf("Se volvera a intentar\n");
-                sleep((int)(time / 2));
-            }
-            while (!feof(fd))
-            {
-                char category;
-                char text[100];
-                fscanf(fd, "%c %s", &category, text);
-                if (category != '\0' && text[0] != '\0')
-                {
-                    struct NewsArticle *article = createNewsArticle(category, text);
-                    writeArticle(article, with_system);
-                    printf("New Article:\n%c: %s\n\n", article->category, article->text);
-                    free(article);
-                }
-            }
-            fclose(fd);
-        } while (fd == NULL);
+            perror("Error abriendo el archivo para leer");
+            printf("Se volvera a intentar\n");
+            createFile(archive);
+            sleep((int)(time / 2));
+        }
+    } while (fd == NULL);
+    while (!feof(fd))
+    {
+        char category;
+        char text[100];
+        fscanf(fd, "%c: %s", &category, text);
+        printf ("'%c' '%s'\n", category, text);
+        if (category != '\0' && text[0] != '\0')
+        {
+            struct NewsArticle *article = createNewsArticle(category, text);
+            printf("New Article:\n%c: %s\n\n", article->category, article->text);
+            writeArticle(article, with_system);
+            free(article);
+        }
     }
+    fclose(fd);
 }
 
 void startSystem(int argc, char **argv)
 {
-    int pipe=mkfifo(with_system, fifo_mode);
     for (int i = 1; i < argc; i += 2)
     {
         if (strcmp(argv[i], "-p") == 0)
             with_system = argv[i + 1];
-        else if (strcmp(argv[i], "-s") == 0)
+        else if (strcmp(argv[i], "-f") == 0)
             archive = argv[i + 1];
         else if (strcmp(argv[i], "-t") == 0)
-            time = atoi(argv[i + 1]);        
+            time = atoi(argv[i + 1]);
     }
 }
 
@@ -103,11 +107,8 @@ bool createArticle(char category, char *text)
     }
 }
 
-void exit(){
-    unlink (with_system);
-    remove (archive);
-    free(with_system);
-    free(archive);
+void end()
+{
     exit(0);
 }
 
@@ -115,25 +116,21 @@ int main(int argc, char **argv)
 {
     startSystem(argc, argv);
     printf(" -p %s\n", with_system);
-    printf(" -s %s\n", archive);
+    printf(" -f %s\n", archive);
     printf(" -t %d\n", time);
-
-    char category;
-    char *text;
-
-    while (true)
-    {
-        readArticles();
-        /*
-        printf("Introduzca la categoria del articulo: ");
-        scanf("%c", &category);
-        printf("Introduzca el texto del articulo: ");
-        scanf("%s", text);
-        if (createArticle(category, text))
-            printf("Articulo creado correctamente\n");
-        else
-            printf("No se ha podido crear el articulo\n");
-        */
-    }
+    /*char category;
+    char *text;*/
+    readArticles();
+    end();
+    /*
+    printf("Introduzca la categoria del articulo: ");
+    scanf("%c", &category);
+    printf("Introduzca el texto del articulo: ");
+    scanf("%s", text);
+    if (createArticle(category, text))
+        printf("Articulo creado correctamente\n");
+    else
+        printf("No se ha podido crear el articulo\n");
+    */
     return 0;
 }
