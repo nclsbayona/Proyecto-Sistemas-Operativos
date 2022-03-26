@@ -126,7 +126,7 @@ void end()
 
 void catch_sigterm()
 {
-    write(STDOUT_FILENO, "END\n", 4);
+    write(STDOUT_FILENO, "END", 4);
     end();
 }
 
