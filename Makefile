@@ -14,7 +14,7 @@ sc:
 
 # Publisher
 pub:
-	$(CC) publisher.c -o publicador && ./publicador -p $(PIPEPUBLISHERS) -f file -t $(TIME)
+	$(CC) -pthread publisher.c -o publicador && ./publicador -p $(PIPEPUBLISHERS) -f file -t $(TIME)
 
 # Subscriptor
 sub:

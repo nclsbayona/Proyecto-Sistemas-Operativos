@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <signal.h>
 char *with_system;
 
 void printArticle(struct NewsArticle *article)
@@ -17,13 +18,13 @@ void startSystem(int argc, char **argv)
             with_system = argv[i + 1];
 }
 
-struct NewsArticle *readArticle()
+struct NewsArticle *readArticle(char * filename)
 {
     int fd, close_status;
     struct NewsArticle *article;
     do
     {
-        fd = open(with_system, O_RDONLY);
+        fd = open(filename, O_RDONLY);
         if (fd == -1)
         {
             const int time = 5;
@@ -55,23 +56,33 @@ struct NewsArticle *readArticle()
 
 void fetchNew()
 {
-    printf ("Fetching new articles...\n");
-    int i=0;
-    while (i++<=3){
-    struct NewsArticle *article = readArticle(with_system);
-    if (article != NULL)
-        printArticle(article);
-    free(article);
+    printf("Fetching new articles...\n");
+    int i = 0;
+    while (i++ <= 3)
+    {
+        struct NewsArticle *article = readArticle(with_system);
+        if (article != NULL)
+            printArticle(article);
+        free(article);
     }
 }
 
-void end(){
+void end()
+{
     exit(0);
 }
+
+void catch_sigterm()
+{
+    write(STDOUT_FILENO, "END\n", 4);
+    end();
+}
+
 
 int main(int argc, char **argv)
 {
     startSystem(argc, argv);
+    signal(SIGINT, catch_sigterm);
     fetchNew();
     end();
     return 0;
