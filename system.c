@@ -121,6 +121,7 @@ void end()
 {
     unlink(with_publishers);
     unlink(with_subscriptors);
+    exit(0);
 }
 
 void catch_sigterm()
