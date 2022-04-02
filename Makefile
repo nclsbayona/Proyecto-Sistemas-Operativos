@@ -16,6 +16,9 @@ sc:
 pub:
 	$(CC) -pthread publisher.c -o publicador && ./publicador -p $(PIPEPUBLISHERS) -f file -t $(TIME)
 
+pub2:
+	$(CC) -pthread publisher.c -o publicador && ./publicador -p $(PIPEPUBLISHERS) -f fil3 -t $(TIME)
+
 # Subscriptor
 sub:
 	$(CC) subscriber.c -o subscriptor && ./subscriptor -s $(PIPESUBSCRIBERS)

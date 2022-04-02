@@ -3,14 +3,43 @@
 typedef struct CommunicationSystem{
     struct Map* writingPipes;
     struct NewsArticle** articles;
+    pid_t *ids;
     int len;
+    int size_ids;
     // TODO: Guardar pipes de lectura
 };
+
+bool idFound(struct CommunicationSystem *cs, pid_t pid)
+{
+    for (int i = 0; i < cs->size_ids; i++)
+        if (cs->ids[i] == pid)
+            return true;
+    return false;
+}
+
+bool artFound(struct CommunicationSystem *cs, struct NewsArticle *article)
+{
+    for (int i = 0; i < cs->len; i++)
+        if (strcmp(cs->articles[i]->text ,article->text)==0 && strcmp(cs->articles[i]->category, article->category)==0)
+            return true;
+    return false;
+}
+
+bool addId(struct CommunicationSystem *cs, pid_t id)
+{
+    if (cs->size_ids++>0)
+        cs->ids = realloc(cs->ids, sizeof(int)*cs->size_ids);
+    else
+        cs->ids = malloc(sizeof(int)*cs->size_ids);
+    cs->ids[cs->size_ids-1] = id;
+    return true;
+}
 
 struct CommunicationSystem *createCommunicationSystem(){
     struct CommunicationSystem *cs = malloc(sizeof(struct CommunicationSystem));
     cs->articles = NULL;
     cs->len = 0;
+    cs->size_ids = 0;
     cs->writingPipes = createMap();
     return cs;
 }

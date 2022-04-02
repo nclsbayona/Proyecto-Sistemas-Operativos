@@ -68,75 +68,54 @@ void startSystem(int argc, char **argv)
 
 void sendArticle(struct NewsArticle *article)
 {
-    char category = article->category;
-    struct Entry *entry = searchEntryInMap(cs->writingPipes, &category);
-    if (entry)
-        for (int i = 0; i < entry->value->len; i++)
-        {
-            int fd;
-            do
-            {
-                fd = open(entry->value->filenames[i], O_WRONLY);
-                if (fd == -1)
-                {
-                    perror("Error abriendo el pipe");
-                    printf("Se volvera a intentar\n");
-                    sleep(time);
-                }
-            } while (fd == -1);
-            // write(fd, article, sizeof(struct NewsArticle));
-            fd = close(fd);
-        }
-}
-
-bool writeArticle(struct NewsArticle *article)
-{
-    write(fd, article, sizeof(struct NewsArticle));
-    return true;
-}
-
-bool artFound(struct CommunicationSystem *cs, struct NewsArticle *article)
-{
-    for (int i = 0; i < cs->len; i++)
-        if (strcmp(cs->articles[i]->text ,article->text)==0)
-            return true;
-    return false;
+    
 }
 
 void readArticle()
 {
-    struct NewsArticle *article;
-    article = malloc(sizeof(struct NewsArticle));
-    read(fd, article, sizeof(struct NewsArticle));
+    struct Message *message=malloc(sizeof(struct Message));
+    read(fd, message, sizeof(struct Message));
+    struct NewsArticle *article=&(message->article);
+    pid_t pid=message->id;
+    if (!idFound(cs, pid))
+        addId(cs, pid);
     if (article->text[0]!='\0' && article->category != '\0' && !artFound(cs, article))
     {
         printf("%c: %s\n", article->category, article->text);
         addNewsArticle(cs, article->category, article->text);
         sendArticle(article);
     }
-    free(article);
 }
 
 void end()
 {
     unlink(with_publishers);
     unlink(with_subscriptors);
+    for (int i = 0; i < cs->len; i++)
+        kill(cs->ids[i], SIGKILL);
     exit(0);
 }
 
-void catch_sigterm()
+void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 4);
     end();
 }
 
+void catch_sigterm()
+{
+    write(STDOUT_FILENO, "TERMINATE", 10);
+    end();
+}
+
 int main(int argc, char **argv)
 {
+    signal(SIGINT, catch_sigint);
+    signal(SIGTERM, catch_sigterm);
     startSystem(argc, argv);
     printf(" -p %s\n", with_publishers);
     printf(" -s %s\n", with_subscriptors);
     printf(" -t %d\n", time);
-    signal(SIGINT, catch_sigterm);
     while (true)
         readArticle();
     return 0;

@@ -1,4 +1,5 @@
 #include "coms.c"
+#include "msg.c"
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -72,7 +73,7 @@ void end()
     exit(0);
 }
 
-void catch_sigterm()
+void catch_sigint()
 {
     write(STDOUT_FILENO, "END\n", 4);
     end();
@@ -82,7 +83,7 @@ void catch_sigterm()
 int main(int argc, char **argv)
 {
     startSystem(argc, argv);
-    signal(SIGINT, catch_sigterm);
+    signal(SIGINT, catch_sigint);
     fetchNew();
     end();
     return 0;

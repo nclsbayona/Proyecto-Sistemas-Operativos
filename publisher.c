@@ -21,26 +21,8 @@ void createFile(char *name)
     close(fd);
 }
 
-bool writeArticle(struct NewsArticle *article, char *filename)
-{
-    // if (strcmp(filename, with_system) == 0)
-    write(fd, article, sizeof(struct NewsArticle));
-    /*else
-    {
-        FILE *f = NULL;
-        do
-        {
-            f = fopen(archive, O_APPEND);
-            if (f == NULL)
-            {
-                perror("Error abriendo el archivo para escribir");
-                printf("Se volvera a intentar\n");
-                sleep((int)(timeP / 2));
-            }
-        } while (f == NULL);
-        write(f, article, sizeof(struct NewsArticle));
-        fclose(f);
-    }*/
+bool writeArticle(struct NewsArticle article, char *filename){
+    write(fd, createMessage(getpid(), article), sizeof(struct Message));
     return true;
 }
 
@@ -74,10 +56,9 @@ void readArticles()
     if (fscanf(fd, "%c: %s", &category, text) > 0)
         if (category != '\0' && text[0] != '\0' && strlen(text) > 0)
         {
-            struct NewsArticle *article = createNewsArticle(category, text);
-            printf("New Article:\n%c: %s\n\n", category, text);
+            struct NewsArticle article = *createNewsArticle(category, text);
+            printf("\nNew Article:\n%c: %s\n\n", category, text);
             writeArticle(article, with_system);
-            free(article);
         }
     FILE *tempFile = fopen("delete-line.tmp", "w");
     rewind(fd);
@@ -128,7 +109,7 @@ void startSystem(int argc, char **argv)
 bool createArticle(char category, char *text)
 {
     struct NewsArticle *article = createNewsArticle(category, text);
-    if (writeArticle(article, archive))
+    if (writeArticle(*article, archive))
     {
         free(article);
         return true;
@@ -155,9 +136,15 @@ void end()
     exit(0);
 }
 
-void catch_sigterm()
+void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 4);
+    end();
+}
+
+void catch_sigterm()
+{
+    write(STDOUT_FILENO, "TERMINATE", 10);
     end();
 }
 
@@ -191,11 +178,12 @@ void readSTDIN()
 
 int main(int argc, char **argv)
 {
+    signal(SIGINT, catch_sigint);
+    signal(SIGTERM, catch_sigterm);
     startSystem(argc, argv);
     printf(" -p %s\n", with_system);
     printf(" -f %s\n", archive);
     printf(" -t %d\n", timeP);
-    signal(SIGINT, catch_sigterm);
     pthread_create(&thread_id1, NULL, (void *)(readTrue), NULL);
     readSTDIN();
     return 0;
