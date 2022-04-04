@@ -1,10 +1,12 @@
 #include "news.c"
-#include "lock.c"
+#include <sys/mman.h>
+int *lock;
 int fd, f, close_status;
 char *with_system;
 char *archive;
 int timeP;
 pthread_t thread_id1;
+
 void createFile(char *name)
 {
     int fd = open(name, O_RDWR | O_CREAT, fifo_mode);
@@ -12,15 +14,12 @@ void createFile(char *name)
 }
 
 bool writeArticle(struct NewsArticle article, char *filename)
-{  
-    //while (*lock);
-    //lockSend();
-    printf("%d\n", getLock());
+{
     printf("Enviando articulo\n");
     write(fd, createMessage(getpid(), article), sizeof(struct Message));
+    printf("Articulo enviado\n");
     alarm(timeP);
     pause();
-    //unlockSend();
     return true;
 }
 
@@ -45,7 +44,7 @@ void readArticles()
         if (fd == NULL)
         {
             perror("Error abriendo el archivo para leer");
-            //printf("Se volvera a intentar\n");
+            // printf("Se volvera a intentar\n");
             createFile(archive);
             sleep((int)(timeP / 2));
         }
@@ -74,7 +73,7 @@ void readArticles()
         if (fd == NULL)
         {
             perror("Error abriendo el archivo para volver a leer");
-            //printf("Se volvera a intentar\n");
+            // printf("Se volvera a intentar\n");
             createFile(archive);
             sleep((int)(timeP / 2));
         }

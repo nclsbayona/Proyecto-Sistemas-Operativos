@@ -1,6 +1,5 @@
 #include "coms.c"
 #include "subscribe.c"
-#include "lock.c"
 bool endL = false;
 char *with_publishers;
 char *with_subscriptors;
@@ -11,8 +10,6 @@ struct CommunicationSystem *cs;
 
 void startSystem(int argc, char **argv)
 {
-    start();
-    printf("%d\n", *lock);
     cs = createCommunicationSystem();
     for (int i = 1; i < argc; i += 2)
     {
@@ -126,7 +123,6 @@ void end()
     unlink(with_subscriptors);
     for (int i = 0; i < cs->size_ids; i++)
         kill(cs->ids[i], SIGINT);
-    endLock();
     exit(0);
 }
 
