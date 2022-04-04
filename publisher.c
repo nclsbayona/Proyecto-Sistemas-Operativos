@@ -1,4 +1,5 @@
 #include "news.c"
+#include "lock.c"
 int fd, f, close_status;
 char *with_system;
 char *archive;
@@ -12,7 +13,12 @@ void createFile(char *name)
 
 bool writeArticle(struct NewsArticle article, char *filename)
 {
+    while (lock);
     write(fd, createMessage(getpid(), article), sizeof(struct Message));
+    lockSend();
+    alarm(timeP);
+    pause();
+    unlockSend();
     return true;
 }
 
@@ -137,6 +143,11 @@ void catch_sigterm()
     end();
 }
 
+void catch_alarm()
+{
+    write(STDOUT_FILENO, "CONTINUE", 9);
+}
+
 void readTrue()
 {
     while (true)
@@ -157,15 +168,16 @@ void readSTDIN()
         printf("Introduzca el texto del articulo (Maximo 80 caracteres): ");
         scanf("%s", text);
         if (createArticle(category, text))
-            printf("Articulo creado correctamente\n");
+            printf("\nArticulo creado correctamente\n");
         else
-            printf("No se ha podido crear el articulo\n");
+            printf("\nNo se ha podido crear el articulo\n");
         free(text);
     }
 }
 
 int main(int argc, char **argv)
 {
+    signal(SIGALRM, catch_alarm);
     signal(SIGINT, catch_sigint);
     signal(SIGTERM, catch_sigterm);
     startSystem(argc, argv);

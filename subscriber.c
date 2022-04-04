@@ -7,7 +7,7 @@ pthread_t thread_id1;
 
 void printArticle(struct NewsArticle *article)
 {
-    printf("New Article:\n%c: %s\n\n", article->category, article->text);
+    printf("\nNew Article:\n%c: %s\n\n", article->category, article->text);
 }
 
 void startSystem(int argc, char **argv)
