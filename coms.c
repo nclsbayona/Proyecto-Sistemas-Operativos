@@ -19,7 +19,7 @@ bool idFound(struct CommunicationSystem *cs, pid_t pid)
 bool artFound(struct CommunicationSystem *cs, struct NewsArticle *article)
 {
     for (int i = 0; i < cs->len; i++)
-        if (strcmp(cs->articles[i]->text ,article->text)==0 && strcmp(cs->articles[i]->category, article->category)==0)
+        if (strcmp(cs->articles[i]->text ,article->text)==0 && cs->articles[i]->category==article->category)
             return true;
     return false;
 }

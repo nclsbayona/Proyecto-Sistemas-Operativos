@@ -1,6 +1,6 @@
 CC=gcc  #compiler
 TIMEF=10 #wait time (system)
-TIMEN=1 #wait time (publisher)
+TIMEN=10 #wait time (publisher)
 PIPEPUBLISHERS=pipeSP #pipe publishers
 PIPESUBSCRIBERS=pipeSS #pipe subscribers
 

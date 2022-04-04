@@ -1,12 +1,27 @@
 //Compartiendo una variable entre procesos
 #include <stdbool.h>
+#include <sys/mman.h>
+#include <stdlib.h>
+int *lock;
 
-bool lock=false;
+int getLock(){
+    return *lock;
+}
 
 void lockSend(){
-    lock=true;
+    *lock=1;
 }
 
 void unlockSend(){
-    lock=false;
+    *lock=0;
+}
+
+void endLock(){
+    munmap(lock, sizeof(int));
+    exit(0);
+}
+
+void start(){
+lock=(int*)mmap(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+unlockSend();
 }

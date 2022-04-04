@@ -12,13 +12,15 @@ void createFile(char *name)
 }
 
 bool writeArticle(struct NewsArticle article, char *filename)
-{
-    while (lock);
+{  
+    //while (*lock);
+    //lockSend();
+    printf("%d\n", getLock());
+    printf("Enviando articulo\n");
     write(fd, createMessage(getpid(), article), sizeof(struct Message));
-    lockSend();
     alarm(timeP);
     pause();
-    unlockSend();
+    //unlockSend();
     return true;
 }
 
@@ -43,7 +45,8 @@ void readArticles()
         if (fd == NULL)
         {
             perror("Error abriendo el archivo para leer");
-            printf("Se volvera a intentar\n");
+            //printf("Se volvera a intentar\n");
+            createFile(archive);
             sleep((int)(timeP / 2));
         }
     } while (fd == NULL);
@@ -71,7 +74,8 @@ void readArticles()
         if (fd == NULL)
         {
             perror("Error abriendo el archivo para volver a leer");
-            printf("Se volvera a intentar\n");
+            //printf("Se volvera a intentar\n");
+            createFile(archive);
             sleep((int)(timeP / 2));
         }
     } while (fd == NULL && ++w < 3);
