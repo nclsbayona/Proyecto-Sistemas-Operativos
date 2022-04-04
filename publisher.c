@@ -1,19 +1,8 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/types.h>
 #include "news.c"
-#include <signal.h>
-#include <pthread.h>
 int fd, f, close_status;
 char *with_system;
 char *archive;
 int timeP;
-mode_t fifo_mode = S_IRUSR | S_IWUSR;
 pthread_t thread_id1;
 void createFile(char *name)
 {
@@ -21,7 +10,8 @@ void createFile(char *name)
     close(fd);
 }
 
-bool writeArticle(struct NewsArticle article, char *filename){
+bool writeArticle(struct NewsArticle article, char *filename)
+{
     write(fd, createMessage(getpid(), article), sizeof(struct Message));
     return true;
 }
@@ -124,7 +114,6 @@ bool createArticle(char category, char *text)
 void end()
 {
     remove("delete-line.tmp");
-    pthread_exit(NULL);
     do
     {
         close_status = close(fd);
@@ -156,18 +145,17 @@ void readTrue()
 
 void readSTDIN()
 {
-    int i=0;
+    int i = 0;
     while (true)
     {
         char category;
         char *text = malloc(sizeof(char) * 90);
         if (i++)
-        scanf("%c", &category);
+            scanf("%c", &category);
         printf("Introduzca la categoria del articulo: ");
         scanf("%c", &category);
-        printf("Introduzca el texto del articulo: ");
+        printf("Introduzca el texto del articulo (Maximo 80 caracteres): ");
         scanf("%s", text);
-        ;
         if (createArticle(category, text))
             printf("Articulo creado correctamente\n");
         else

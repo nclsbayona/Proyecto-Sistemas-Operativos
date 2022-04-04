@@ -1,5 +1,5 @@
 CC=gcc  #compiler
-TIME=10 #target file name
+TIME=10 #wait time
 PIPEPUBLISHERS=pipeSP #pipe publishers
 PIPESUBSCRIBERS=pipeSS #pipe subscribers
 
@@ -10,7 +10,7 @@ PIPESUBSCRIBERS=pipeSS #pipe subscribers
 
 # SC
 sc:
-	$(CC) system.c -o sistema && ./sistema -p $(PIPEPUBLISHERS) -s $(PIPESUBSCRIBERS) -t $(TIME)
+	$(CC) -pthread system.c -o sistema && ./sistema -p $(PIPEPUBLISHERS) -s $(PIPESUBSCRIBERS) -t $(TIME)
 
 # Publisher
 pub:
@@ -21,4 +21,4 @@ pub2:
 
 # Subscriptor
 sub:
-	$(CC) subscriber.c -o subscriptor && ./subscriptor -s $(PIPESUBSCRIBERS)
+	$(CC) -pthread subscriber.c -o subscriptor && ./subscriptor -s $(PIPESUBSCRIBERS)

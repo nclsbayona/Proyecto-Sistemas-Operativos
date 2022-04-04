@@ -1,7 +1,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <pthread.h>
+mode_t fifo_mode = S_IRUSR | S_IWUSR;
 typedef struct NewsArticle
 {
     char category;

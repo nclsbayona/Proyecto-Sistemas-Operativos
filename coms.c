@@ -6,7 +6,6 @@ typedef struct CommunicationSystem{
     pid_t *ids;
     int len;
     int size_ids;
-    // TODO: Guardar pipes de lectura
 };
 
 bool idFound(struct CommunicationSystem *cs, pid_t pid)
@@ -55,4 +54,22 @@ void addNewsArticle(struct CommunicationSystem *cs, char category, char *text){
 
 void subscribeToTopic(struct CommunicationSystem *cs, char key, char *filename){
     subscribeToEntry(cs->writingPipes, key, filename);
+}
+
+bool sendToSub(struct NewsArticle* art, char *filename){
+    int pipe = open(filename, O_WRONLY, fifo_mode);
+    if (pipe == -1)
+    {
+        perror("Error abriendo el pipe");
+        return false;
+    }
+    write(pipe, art, sizeof(struct NewsArticle));
+    return true;
+}
+
+void sendToSubs(struct NewsArticle *article, struct CommunicationSystem *cs){
+    struct Entry *entry = searchEntryInMap(cs->writingPipes, article->category);
+    if (entry != NULL)
+        for (int i = 0; i < entry->value->len; i++)
+           while  (!sendToSub(article, entry->value->filenames[i]));
 }
