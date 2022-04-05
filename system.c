@@ -8,6 +8,7 @@ int fd, close_status, fd2, close_status2;
 pthread_t thread_id1;
 struct CommunicationSystem *cs;
 
+//Funcion para inicializar el SC, se añadio para poder inicializar el SC
 void startSystem(int argc, char **argv)
 {
     cs = createCommunicationSystem();
@@ -61,11 +62,14 @@ void startSystem(int argc, char **argv)
     } while (fd == -1);
 }
 
+//Funcion que envia un articulo a los suscriptores, se añadio para enviar un articulo a suscriptores
 void sendArticle(struct NewsArticle *article)
 {
     sendToSubs(article, cs);
 }
 
+
+//Funcion que lee un articulo, se añadio para leer un articulo
 void readArticle()
 {
     struct Message *message = malloc(sizeof(struct Message));
@@ -82,6 +86,7 @@ void readArticle()
     }
 }
 
+//Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
 void listenForSubscriptors()
 {
     do
@@ -111,12 +116,14 @@ void listenForSubscriptors()
     }
 }
 
+//Funcion para leer articulos permanentemente, se añadio para leer articulos permanentemente
 void readTrue()
 {
     while (true)
         readArticle();
 }
 
+//Funcion que finaliza el SC, se añadio para que el SC finalize correctamente
 void end()
 {
     unlink(with_publishers);
@@ -126,12 +133,14 @@ void end()
     exit(0);
 }
 
+//Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
 void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 4);
     end();
 }
 
+//Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
 void catch_sigterm()
 {
     write(STDOUT_FILENO, "TERMINATE", 10);

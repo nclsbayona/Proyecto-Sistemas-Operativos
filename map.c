@@ -1,28 +1,33 @@
 #include <stdbool.h>
 #include <stdlib.h>
+// Estructura de datos que almacena las suscripciones a una categoria en el sistema de comunicaciones
 typedef struct Value
 {
     int len;
     char **filenames;
 };
 
+// Estructura de datos que almacena la información de una categoria en el sistema de comunicaciones
 typedef struct Key
 {
     char key;
 };
 
+// Estructura de datos que almacena la información completa de una entrada en el sistema de comunicaciones (Llave y valor), es decir, una categoria y sus suscripciones en este caso
 typedef struct Entry
 {
     struct Key *key;
     struct Value *value;
 };
 
+// Estructura de datos que almacena la información de las diferentes entradas en el sistema de comunicaciones
 typedef struct Map
 {
     int len;
     struct Entry **entries;
 };
 
+//Busca una entrada en el mapa de un sistema de comunicaciones por medio de su categoria
 struct Entry *searchEntryInMap(struct Map *map, const char key)
 {
     struct Entry *entry = NULL;
@@ -32,6 +37,7 @@ struct Entry *searchEntryInMap(struct Map *map, const char key)
     return entry;
 }
 
+//Añade una entrada al mapa de un sistema de comunicaciones
 bool addEntryToMap(struct Map *map, struct Entry *entry)
 {
     bool r = true;
@@ -43,6 +49,7 @@ bool addEntryToMap(struct Map *map, struct Entry *entry)
     return r;
 }
 
+//Crea una objeto de tipo entrada a partir de una categoria y sus suscripciones para añadirla al sistema de comunicaciones
 struct Entry *createEntry(char key, struct Value *value)
 {
     struct Entry *entry = malloc(sizeof(struct Entry));
@@ -52,6 +59,7 @@ struct Entry *createEntry(char key, struct Value *value)
     return entry;
 }
 
+//Añade un archivo a la lista de suscripciones de una categoria especifica en el mapa de un sistema de comunicaciones
 void subscribeToEntry(struct Map *map, char key, char *filename)
 {
     struct Entry *entry = searchEntryInMap(map, key);
@@ -63,7 +71,8 @@ void subscribeToEntry(struct Map *map, char key, char *filename)
         entry = createEntry(key, value);
         addEntryToMap(map, entry);
     }
-    else if (!entry->value){
+    else if (!entry->value)
+    {
         entry->value = malloc(sizeof(struct Value));
         entry->value->len = 0;
     }
@@ -74,6 +83,7 @@ void subscribeToEntry(struct Map *map, char key, char *filename)
     entry->value->filenames[entry->value->len - 1] = filename;
 }
 
+//Inicializa un mapa
 struct Map *createMap()
 {
     struct Map *map = (struct Map *)malloc(sizeof(struct Map));

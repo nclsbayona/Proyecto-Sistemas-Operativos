@@ -5,11 +5,13 @@ char *with_system;
 char pipename[100];
 pthread_t thread_id1;
 
+//Funcion para imprimir un articulo, se añadio para imprimir un articulo
 void printArticle(struct NewsArticle *article)
 {
     printf("\nNew Article:\n%c: %s\n\n", article->category, article->text);
 }
 
+//Funcion que inicializa lo relacionado con un suscriptor, se añadio para poder inicializar un suscriptor
 void startSystem(int argc, char **argv)
 {
     for (int i = 1; i < argc; i += 2)
@@ -28,12 +30,14 @@ void startSystem(int argc, char **argv)
     sprintf(pipename, "PipeWithProcess%d", (int)(getpid()));
 }
 
+///Funcion que lee un articulo de un archivo y los imprime (Otra función), se añadio para poder leer articulos de un archivo e imprimirlos
 void readArticles(){
     struct NewsArticle *article = malloc(sizeof(struct NewsArticle));
     read(pipeS, article, sizeof(struct NewsArticle));
     printArticle(article);
 }
 
+//Funcion que lee articulos de un archivo (Otra función) permanentemente, se añadio para poder leer articulos de un archivo permanentemente
 void readTrue()
 {
     do
@@ -62,12 +66,14 @@ void readTrue()
 
 }
 
+//Funcion que envia una suscripcion al SC dada una serie de categorias, se añadio para poder enviar una suscripcion al SC
 bool sendSubscription(char *categories)
 {
     write(fd, createSubscribe(getpid(), pipename, categories), sizeof(struct Subscribe));
     return true;
 }
 
+//Funcion que lee una suscripcion del SC y la envia (Otra función), se añadio para poder leer una suscripcion y enviarla al SC
 void writeSub()
 {
     char *text = malloc(sizeof(char) * 90);
@@ -80,24 +86,28 @@ void writeSub()
     free(text);
 }
 
+//Funcion que envia suscripciones permanentemente al SC, se añadio para poder enviar suscripciones permanentemente al SC
 void writeTrue()
 {
     while (true)
         writeSub();
 }
 
+//Funcion que finaliza el suscriptor, se añadio para poder finalizar el suscriptor
 void end()
 {
     unlink(pipename);
     exit(0);
 }
 
+//Funcion para capturar una señal y poder finalizar el suscriptor correctamente, se añadio para poder capturar una señal y finalizar el suscriptor
 void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 4);
     end();
 }
 
+//Funcion para capturar una señal y poder finalizar el suscriptor correctamente, se añadio para poder capturar una señal y finalizar el suscriptor
 void catch_sigterm()
 {
     write(STDOUT_FILENO, "TERMINATE", 10);
