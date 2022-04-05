@@ -80,10 +80,12 @@ void readArticle()
         addId(cs, pid);
     if (article->text[0] != '\0' && article->category != '\0' && !artFound(cs, article))
     {
-        printf("%c: %s\n", article->category, article->text);
+        printf("\nArticle\n%c: %s\n\n", article->category, article->text);
         addNewsArticle(cs, article->category, article->text);
         sendArticle(article);
     }
+    article=NULL;
+    free(message);
 }
 
 //Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
