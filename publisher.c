@@ -17,8 +17,7 @@ bool writeArticle(struct NewsArticle article, char *filename)
 {
     printf("Enviando articulo\n");
     write(fd, createMessage(getpid(), article), sizeof(struct Message));
-    alarm(timeP);
-    pause();
+    sleep(timeP);
     printf("Articulo enviado\n");
     return true;
 }
@@ -93,14 +92,14 @@ void readArticles()
         }
     } while (fd == NULL);
     char category;
-    char text[100];
+    char *text=malloc(sizeof(char)*100);
     if (fscanf(fd, "%c: %s", &category, text) > 0)
-        if (category != '\0' && text[0] != '\0' && strlen(text) > 0)
+        if (category != (char)10 && text[0] != '\0' && strlen(text) > 1)
         {
             printf("\nNew Article:\n%c: %s\n\n", category, text);
             createArticle(category, text);
         }
-    printf("AqUI\n");
+    free(text);
     FILE *tempFile = fopen("delete-line.tmp", "w");
     rewind(fd);
     deleteLine(fd, tempFile, 0);
