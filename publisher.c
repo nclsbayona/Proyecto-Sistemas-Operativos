@@ -111,7 +111,6 @@ void readArticles()
     char *category = malloc(sizeof(char));
     char *text = malloc(sizeof(char) * 100);
     fscanf(fd, "%c: %s", category, text);
-    printf("category %d\n", *category);
     if (*category == 0)
     {
         printf("\nArchivo vacio\n");

@@ -1,6 +1,7 @@
 CC=gcc  #compiler
-TIMEF=10 #wait time (system)
+TIMEF=20 #wait time (system)
 TIMEN=10 #wait time (publisher)
+TIMEN2=5 #wait time (publisher2)
 PIPEPUBLISHERS=pipeSP #pipe publishers
 PIPESUBSCRIBERS=pipeSS #pipe subscribers
 
@@ -18,7 +19,7 @@ pub:
 	$(CC) -pthread publisher.c -o publicador && ./publicador -p $(PIPEPUBLISHERS) -f file -t $(TIMEN)
 
 pub2:
-	$(CC) -pthread publisher.c -o publicador && ./publicador -p $(PIPEPUBLISHERS) -f fil3 -t $(TIMEN)
+	$(CC) -pthread publisher.c -o publicador && ./publicador -p $(PIPEPUBLISHERS) -f fil3 -t $(TIMEN2)
 
 # Subscriptor
 sub:
