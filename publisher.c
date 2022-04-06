@@ -5,14 +5,14 @@ char *archive;
 int timeP;
 pthread_t thread_id1;
 
-//Funcion que crea un archivo a partir de un nombre, se añadio para poder crear un archivo en caso de que no exista
+// Funcion que crea un archivo a partir de un nombre, se añadio para poder crear un archivo en caso de que no exista
 void createFile(char *name)
 {
     int fd = open(name, O_RDWR | O_CREAT, fifo_mode);
     close(fd);
 }
 
-//Funcion que envia un articulo a un pipe especificado (Para el pipe de escritura), se añadio para poder enviar un articulo al SC
+// Funcion que envia un articulo a un pipe especificado (Para el pipe de escritura), se añadio para poder enviar un articulo al SC
 bool writeArticle(struct NewsArticle article, char *filename)
 {
     printf("Enviando articulo\n");
@@ -22,7 +22,24 @@ bool writeArticle(struct NewsArticle article, char *filename)
     return true;
 }
 
-//Funcion que elimina una linea de un archivo y guarda el contenido en otro, se añadio para poder eliminar una linea de un archivo al leer de este
+// Funcion que finaliza el publicador, se añadio para poder finalizar un publicador
+void end()
+{
+    remove("delete-line.tmp");
+    struct NewsArticle *art = createNewsArticle((char)0, "END");
+    write(fd, createMessage(getpid(), *art), sizeof(struct Message));
+    do
+    {
+        close_status = close(fd);
+        if (close_status == -1)
+        {
+            perror("close");
+        }
+    } while (close_status == -1);
+    exit(0);
+}
+
+// Funcion que elimina una linea de un archivo y guarda el contenido en otro, se añadio para poder eliminar una linea de un archivo al leer de este
 void deleteLine(FILE *srcFile, FILE *tempFile, const int line)
 {
     const int BUFFER_SIZE = 1024;
@@ -35,7 +52,7 @@ void deleteLine(FILE *srcFile, FILE *tempFile, const int line)
     }
 }
 
-//Funcion que inicializa lo relacionado con un publicador, se añadio para poder inicializar un publicador
+// Funcion que inicializa lo relacionado con un publicador, se añadio para poder inicializar un publicador
 void startSystem(int argc, char **argv)
 {
     for (int i = 1; i < argc; i += 2)
@@ -60,7 +77,7 @@ void startSystem(int argc, char **argv)
     } while (fd == -1);
 }
 
-//Funcion que crea un articulo y lo envia a un pipe especificado (Otra funcion), se añadio para poder crear un articulo y enviarlo al SC
+// Funcion que crea un articulo y lo envia a un pipe especificado (Otra funcion), se añadio para poder crear un articulo y enviarlo al SC
 bool createArticle(char category, char *text)
 {
     struct NewsArticle *article = createNewsArticle(category, text);
@@ -76,7 +93,7 @@ bool createArticle(char category, char *text)
     }
 }
 
-//Funcion que lee articulos de un archivo y los envia a un pipe especificado (Otra función), se añadio para poder leer articulos de un archivo y enviarlos al SC
+// Funcion que lee articulos de un archivo y los envia a un pipe especificado (Otra función), se añadio para poder leer articulos de un archivo y enviarlos al SC
 void readArticles()
 {
     FILE *fd = NULL;
@@ -91,14 +108,24 @@ void readArticles()
             sleep((int)(timeP / 2));
         }
     } while (fd == NULL);
-    char category;
-    char *text=malloc(sizeof(char)*100);
-    if (fscanf(fd, "%c: %s", &category, text) > 0)
-        if (category != (char)10 && text[0] != '\0' && strlen(text) > 1)
-        {
-            printf("\nNew Article:\n%c: %s\n\n", category, text);
-            createArticle(category, text);
-        }
+    char *category = malloc(sizeof(char));
+    char *text = malloc(sizeof(char) * 100);
+    fscanf(fd, "%c: %s", category, text);
+    printf("category %d\n", *category);
+    if (*category == 0)
+    {
+        printf("\nArchivo vacio\n");
+        free(category);
+        fclose(fd);
+        end();
+    }
+    else if (*category != (char)10 && text[0] != 0 && text[0] != (char)10 && strlen(text) > 1)
+    {
+
+        printf("\nNew Article:\n%c: %s\n\n", *category, text);
+        createArticle(*category, text);
+    }
+    free(category);
     free(text);
     FILE *tempFile = fopen("delete-line.tmp", "w");
     rewind(fd);
@@ -123,49 +150,34 @@ void readArticles()
     fclose(fd);
 }
 
-//Funcion que finaliza el publicador, se añadio para poder finalizar un publicador
-void end()
-{
-    remove("delete-line.tmp");
-    do
-    {
-        close_status = close(fd);
-        if (close_status == -1)
-        {
-            perror("close");
-        }
-    } while (close_status == -1);
-    exit(0);
-}
-
-//Funcion para capturar una señal y poder finalizar el publicador correctamente, se añadio para poder capturar una señal y finalizar el publicador
+// Funcion para capturar una señal y poder finalizar el publicador correctamente, se añadio para poder capturar una señal y finalizar el publicador
 void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 3);
     end();
 }
 
-//Funcion para capturar una señal y poder finalizar el publicador correctamente, se añadio para poder capturar una señal y finalizar el publicador
+// Funcion para capturar una señal y poder finalizar el publicador correctamente, se añadio para poder capturar una señal y finalizar el publicador
 void catch_sigterm()
 {
     write(STDOUT_FILENO, "TERMINATE", 9);
     end();
 }
 
-//Funcion para capturar una señal de alarma, se añadio para poder capturar una señal de alarma y seguir con la ejecucion del programa
+// Funcion para capturar una señal de alarma, se añadio para poder capturar una señal de alarma y seguir con la ejecucion del programa
 void catch_alarm()
 {
     write(STDOUT_FILENO, "ALARM", 5);
 }
 
-//Funcion para leer el archivo eternamente, se añadio para poder leer el archivo
+// Funcion para leer el archivo eternamente, se añadio para poder leer el archivo
 void readTrue()
 {
     while (true)
         readArticles();
 }
 
-//Funcion para leer la entrada de texto
+// Funcion para leer la entrada de texto
 void readSTDIN()
 {
     int i = 0;

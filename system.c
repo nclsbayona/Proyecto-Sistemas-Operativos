@@ -8,7 +8,19 @@ int fd, close_status, fd2, close_status2;
 pthread_t thread_id1;
 struct CommunicationSystem *cs;
 
-//Funcion para inicializar el SC, se añadio para poder inicializar el SC
+// Funcion que finaliza el SC, se añadio para que el SC finalize correctamente
+void end()
+{
+    unlink(with_publishers);
+    unlink(with_subscriptors);
+    for (int i = 0; i < cs->size_ids; i++)
+        kill(cs->ids[i], SIGINT);
+    for (int i = 0; i < cs->size_idsP; i++)
+        kill(cs->idsP[i], SIGINT);
+    exit(0);
+}
+
+// Funcion para inicializar el SC, se añadio para poder inicializar el SC
 void startSystem(int argc, char **argv)
 {
     cs = createCommunicationSystem();
@@ -62,33 +74,50 @@ void startSystem(int argc, char **argv)
     } while (fd == -1);
 }
 
-//Funcion que envia un articulo a los suscriptores, se añadio para enviar un articulo a suscriptores
+// Funcion que envia un articulo a los suscriptores, se añadio para enviar un articulo a suscriptores
 void sendArticle(struct NewsArticle *article)
 {
-    sendToSubs(article, cs);
+    if (article == NULL)
+    {
+        article = createNewsArticle('.', "No hay mas articulos");
+        sendToAll(article, cs);
+        end();
+    }
+    else
+        sendToSubs(article, cs);
 }
 
-
-//Funcion que lee un articulo, se añadio para leer un articulo
+// Funcion que lee un articulo, se añadio para leer un articulo
 void readArticle()
 {
     struct Message *message = malloc(sizeof(struct Message));
     read(fd, message, sizeof(struct Message));
     struct NewsArticle *article = &(message->article);
     pid_t pid = message->id;
-    if (!idFound(cs, pid))
-        addId(cs, pid);
+    if (!idPFound(cs, pid))
+        addIdP(cs, pid);
     if (article->text[0] != '\0' && article->category != '\0' && !artFound(cs, article))
     {
-        printf("\nArticle\n%c: %s\n\n", article->category, article->text);
-        addNewsArticle(cs, article->category, article->text);
-        sendArticle(article);
+        if (article->category==(char)0 && strcmp(article->text, "End")==0)
+        {
+            removeidP(cs, pid);
+            if (cs->size_idsP == 0)
+            {
+                article = NULL;
+            }
+        }
+        else
+        {
+            printf("\nArticle\n%c: %s\n\n", article->category, article->text);
+            addNewsArticle(cs, article->category, article->text);
+            sendArticle(article);
+        }
     }
-    article=NULL;
+    article = NULL;
     free(message);
 }
 
-//Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
+// Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
 void listenForSubscriptors()
 {
     do
@@ -118,31 +147,21 @@ void listenForSubscriptors()
     }
 }
 
-//Funcion para leer articulos permanentemente, se añadio para leer articulos permanentemente
+// Funcion para leer articulos permanentemente, se añadio para leer articulos permanentemente
 void readTrue()
 {
     while (true)
         readArticle();
 }
 
-//Funcion que finaliza el SC, se añadio para que el SC finalize correctamente
-void end()
-{
-    unlink(with_publishers);
-    unlink(with_subscriptors);
-    for (int i = 0; i < cs->size_ids; i++)
-        kill(cs->ids[i], SIGINT);
-    exit(0);
-}
-
-//Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
+// Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
 void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 4);
     end();
 }
 
-//Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
+// Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
 void catch_sigterm()
 {
     write(STDOUT_FILENO, "TERMINATE", 10);
@@ -153,8 +172,8 @@ int main(int argc, char **argv)
 {
     signal(SIGINT, catch_sigint);
     signal(SIGSTOP, catch_sigint);
-    signal (SIGABRT, catch_sigterm);
-    signal (SIGQUIT, catch_sigterm);
+    signal(SIGABRT, catch_sigterm);
+    signal(SIGQUIT, catch_sigterm);
     signal(SIGTERM, catch_sigterm);
     startSystem(argc, argv);
     printf(" -p %s\n", with_publishers);
