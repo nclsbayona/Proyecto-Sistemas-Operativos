@@ -92,20 +92,27 @@ void readArticle()
         addIdP(cs, pid);
     if (!artFound(cs, article))
     {
-        if (article->category == (char)0)
+        if (article->category == 0)
         {
-            article = createNewsArticle('.', "No hay mas articulos");
-            sendToAll(article, cs);
-            end();
+            removeidP(cs, pid);
         }
-        else
+        if (cs->size_idsP == 0)
+        {
+            sleep(timeP);
+            if (cs->size_idsP == 0)
+            {
+                article = createNewsArticle('.', "No hay mas articulos");
+                sendToAll(article, cs);
+                end();
+            }
+        }
+        else if (article->category != 0)
         {
             printf("\nArticle\n%c: %s\n\n", article->category, article->text);
             addNewsArticle(cs, article->category, article->text);
             sendArticle(article);
         }
     }
-    free(article);
     free(message);
 }
 
