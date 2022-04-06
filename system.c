@@ -13,9 +13,10 @@ void end()
 {
     unlink(with_publishers);
     unlink(with_subscriptors);
-    for (int i = 0; i < cs->size_ids; i++)
+    int i;
+    for (i = 0; i < cs->size_ids; i++)
         kill(cs->ids[i], SIGINT);
-    for (int i = 0; i < cs->size_idsP; i++)
+    for (i = 0; i < cs->size_idsP; i++)
         kill(cs->idsP[i], SIGINT);
     exit(0);
 }
@@ -77,14 +78,7 @@ void startSystem(int argc, char **argv)
 // Funcion que envia un articulo a los suscriptores, se añadio para enviar un articulo a suscriptores
 void sendArticle(struct NewsArticle *article)
 {
-    if (article == NULL)
-    {
-        article = createNewsArticle('.', "No hay mas articulos");
-        sendToAll(article, cs);
-        end();
-    }
-    else
-        sendToSubs(article, cs);
+    sendToSubs(article, cs);
 }
 
 // Funcion que lee un articulo, se añadio para leer un articulo
@@ -96,15 +90,13 @@ void readArticle()
     pid_t pid = message->id;
     if (!idPFound(cs, pid))
         addIdP(cs, pid);
-    if (article->text[0] != '\0' && article->category != '\0' && !artFound(cs, article))
+    if (!artFound(cs, article))
     {
-        if (article->category==(char)0 && strcmp(article->text, "End")==0)
+        if (article->category == (char)0)
         {
-            removeidP(cs, pid);
-            if (cs->size_idsP == 0)
-            {
-                article = NULL;
-            }
+            article = createNewsArticle('.', "No hay mas articulos");
+            sendToAll(article, cs);
+            end();
         }
         else
         {
@@ -113,7 +105,7 @@ void readArticle()
             sendArticle(article);
         }
     }
-    article = NULL;
+    free(article);
     free(message);
 }
 
