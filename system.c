@@ -174,6 +174,18 @@ int main(int argc, char **argv)
     signal(SIGABRT, catch_sigterm);
     signal(SIGQUIT, catch_sigterm);
     signal(SIGTERM, catch_sigterm);
+
+    if (argc < 7) {
+        printf("Syntaxix invalida, revise los argumentos ingresados\n");
+    }
+
+    for (int i = 1; i < argc; i = i + 2){
+        if (strcmp("-p", argv[i]) != 0 && strcmp("-f", argv[i]) != 0 && strcmp("-t", argv[i]) != 0){
+            printf("Syntaxix invalida, revise los argumentos ingresados\n");
+            return -1;
+        }
+    }
+
     startSystem(argc, argv);
     printf(" -p %s\n", with_publishers);
     printf(" -s %s\n", with_subscriptors);
