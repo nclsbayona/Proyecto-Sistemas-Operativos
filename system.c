@@ -82,6 +82,7 @@ void sendArticle(struct NewsArticle *article)
 }
 
 // Funcion que lee un articulo, se añadio para leer un articulo
+//TODO send multiple articles
 void readArticle()
 {
     struct Message *message = malloc(sizeof(struct Message));
@@ -110,10 +111,17 @@ void readArticle()
         {
             printf("\nArticle\n%c: %s\n\n", article->category, article->text);
             addNewsArticle(cs, article->category, article->text);
+            
             sendArticle(article);
         }
     }
     free(message);
+}
+
+void sendPreviousArticles(struct CommunicationSystem *cs, char key, char *filename){
+    for(int i = 0; i < strlen(cs->articles); i++){
+        sendToSub(cs->articles[i],filename);
+    }
 }
 
 // Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
@@ -141,6 +149,7 @@ void listenForSubscriptors()
                 char cat = subscribe->categories[i];
                 if (cat != '\0' && cat != '_')
                     subscribeToTopic(cs, cat, subscribe->filename);
+                    sendPreviousArticles(cs,cat,subscribe->filename);
             }
         }
     }
