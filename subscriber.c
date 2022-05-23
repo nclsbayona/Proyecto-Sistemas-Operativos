@@ -117,11 +117,11 @@ void catch_sigterm()
 int main(int argc, char **argv)
 {
     if (argc < 3) {
-        printf("Syntaxix invalida, revise los argumentos ingresados\n");
+        printf("Sintaxis invalida, revise los argumentos ingresados\n");
     }
 
-    if (strcmp("-p", argv[1]) != 0 ){
-        printf("Syntaxix invalida, revise los argumentos ingresados\n");
+    if (strcmp("-s", argv[1]) != 0 ){
+        printf("Sintaxis invalida, revise los argumentos ingresados\n");
         return -1;
     }
 
