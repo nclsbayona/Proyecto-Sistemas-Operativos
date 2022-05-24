@@ -158,10 +158,10 @@ void readArticle()
  */
 void sendPreviousArticles(struct CommunicationSystem *cs, char key, char *filename){
     sem_wait(&s);
-    for(int i = 0; i < strlen(cs->articles); i++){
+    for(int i = 0; i < cs->len; i++){
+        //printf("\nArticle\n%c: %c\n\n", key, cs->articles[i]->category);
         if(cs->articles[i]->category == key){
             /* Sending the article to the subscriber. */
-        
             sendToSub(cs->articles[i],filename);
         }
     }
