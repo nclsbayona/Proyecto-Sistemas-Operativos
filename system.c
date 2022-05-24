@@ -13,6 +13,9 @@ struct CommunicationSystem *cs;
 sem_t s;
 
 // Funcion que finaliza el SC, se añadio para que el SC finalize correctamente
+/**
+ * It kills all the processes that are still alive
+ */
 void end()
 {
     unlink(with_publishers);
@@ -26,6 +29,13 @@ void end()
 }
 
 // Funcion para inicializar el SC, se añadio para poder inicializar el SC
+/**
+ * It creates the two pipes that will be used to communicate with the publishers and the subscriptors,
+ * and it opens the pipe that will be used to communicate with the publishers
+ * 
+ * @param argc The number of arguments passed to the program.
+ * @param argv the arguments passed to the program
+ */
 void startSystem(int argc, char **argv)
 {
     cs = createCommunicationSystem();
@@ -80,6 +90,11 @@ void startSystem(int argc, char **argv)
 }
 
 // Funcion que envia un articulo a los suscriptores, se añadio para enviar un articulo a suscriptores
+/**
+ * It sends the article to all the subscribers in the cs list
+ * 
+ * @param article The article to send to subscribers.
+ */
 void sendArticle(struct NewsArticle *article)
 {
     sendToSubs(article, cs);
@@ -87,6 +102,15 @@ void sendArticle(struct NewsArticle *article)
 
 // Funcion que lee un articulo, se añadio para leer un articulo
 //TODO send multiple articles
+/**
+ * It reads a message from the pipe, checks if the process that sent the message is registered in the
+ * list of processes, if it is not, it adds it to the list, then it checks if the article is already in
+ * the list of articles, if it is not, it checks if the category is 0, if it is, it removes the process
+ * from the list of processes, if the list of processes is empty, it waits for a certain amount of
+ * time, if the list is still empty, it sends a message to all the processes that there are no more
+ * articles, if the list is not empty, it checks if the category is not 0, if it is not, it prints the
+ * article, adds it to the list of articles and sends it to all the processes
+ */
 void readArticle()
 {
     struct Message *message = malloc(sizeof(struct Message));
@@ -123,10 +147,21 @@ void readArticle()
     free(message);
 }
 
+// Funcion que envia los articulos previamente escritos a los suscriptores, se añadio para enviar los articulos previamente escritos
+
+/**
+ * It sends all the articles that have the same category as the key to the subscriber
+ * 
+ * @param cs The CommunicationSystem struct.
+ * @param key The category of the article.
+ * @param filename The name of the file to which the article is to be sent.
+ */
 void sendPreviousArticles(struct CommunicationSystem *cs, char key, char *filename){
     sem_wait(&s);
     for(int i = 0; i < strlen(cs->articles); i++){
         if(cs->articles[i]->category == key){
+            /* Sending the article to the subscriber. */
+        
             sendToSub(cs->articles[i],filename);
         }
     }
@@ -165,6 +200,9 @@ void listenForSubscriptors()
 }
 
 // Funcion para leer articulos permanentemente, se añadio para leer articulos permanentemente
+/**
+ * It writes "END" to the standard output and then calls the end() function
+ */
 void readTrue()
 {
     while (true)
@@ -172,6 +210,9 @@ void readTrue()
 }
 
 // Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
+/**
+ * It writes "END" to the standard output and then calls the end() function
+ */
 void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 4);
@@ -179,12 +220,23 @@ void catch_sigint()
 }
 
 // Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
+/**
+ * It writes "TERMINATE" to the standard output and then calls the end() function
+ */
 void catch_sigterm()
 {
     write(STDOUT_FILENO, "TERMINATE", 10);
     end();
 }
 
+/**
+ * It's a function that reads the arguments and starts the system
+ * 
+ * @param argc The number of arguments passed to the program.
+ * @param argv 
+ * 
+ * @return The return value of the function is the exit status of the program.
+ */
 int main(int argc, char **argv)
 {
     signal(SIGINT, catch_sigint);
