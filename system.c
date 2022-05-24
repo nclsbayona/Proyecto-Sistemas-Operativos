@@ -1,5 +1,7 @@
 #include "coms.c"
 #include "subscribe.c"
+#include <semaphore.h>
+
 bool endL = false;
 char *with_publishers;
 char *with_subscriptors;
@@ -7,6 +9,8 @@ int timeP;
 int fd, close_status, fd2, close_status2;
 pthread_t thread_id1;
 struct CommunicationSystem *cs;
+
+sem_t s;
 
 // Funcion que finaliza el SC, se añadio para que el SC finalize correctamente
 void end()
@@ -110,8 +114,9 @@ void readArticle()
         else if (article->category != 0)
         {
             printf("\nArticle\n%c: %s\n\n", article->category, article->text);
+            sem_wait(&s);
             addNewsArticle(cs, article->category, article->text);
-            
+            sem_post(&s);
             sendArticle(article);
         }
     }
@@ -119,9 +124,13 @@ void readArticle()
 }
 
 void sendPreviousArticles(struct CommunicationSystem *cs, char key, char *filename){
+    sem_wait(&s);
     for(int i = 0; i < strlen(cs->articles); i++){
-        sendToSub(cs->articles[i],filename);
+        if(cs->articles[i]->category == key){
+            sendToSub(cs->articles[i],filename);
+        }
     }
+    sem_post(&s);
 }
 
 // Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
@@ -183,6 +192,8 @@ int main(int argc, char **argv)
     signal(SIGABRT, catch_sigterm);
     signal(SIGQUIT, catch_sigterm);
     signal(SIGTERM, catch_sigterm);
+
+    sem_init(&s, 0, 1);
 
     if (argc < 7) {
         printf("Sintaxis invalida, revise los argumentos ingresados\n");
