@@ -169,6 +169,7 @@ void sendPreviousArticles(struct CommunicationSystem *cs, char key, char *filena
 }
 
 // Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
+/* It's a function that listens for subscriptors and adds them to the list of subscriptors. */
 void listenForSubscriptors()
 {
     do
