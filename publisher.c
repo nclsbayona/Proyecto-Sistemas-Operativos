@@ -5,14 +5,37 @@ char *archive;
 int timeP;
 pthread_t thread_id1;
 
-// Funcion que crea un archivo a partir de un nombre, se añadio para poder crear un archivo en caso de que no exista
+/*
+file: publisher.c
+Authors: Nicolas Bayona, Manuel Rios, Abril Cano 
+Contains: implementation of functions that creates the structures
+of news that will be sent, managed, created etc
+Date of last update: 24/05/2022
+*/
+
+/**
+ * Function: createFile
+ * 
+ * Parameters: name The name of the file to create.
+ * Returns: None
+ * Description: It creates a file with the name passed in as the first argument.
+ */
 void createFile(char *name)
 {
     int fd = open(name, O_RDWR | O_CREAT, fifo_mode);
     close(fd);
 }
 
-// Funcion que envia un articulo a un pipe especificado (Para el pipe de escritura), se añadio para poder enviar un articulo al SC
+
+/**
+ * Function: writeArticle
+ * 
+ * Parameters: article The article to be written.
+ *           filename The name of the file to write to.
+ * 
+ * Returns: A boolean value.
+ * Decription: It writes an article to a file
+ */
 bool writeArticle(struct NewsArticle article, char *filename)
 {
     printf("Enviando articulo\n");
@@ -22,7 +45,13 @@ bool writeArticle(struct NewsArticle article, char *filename)
     return true;
 }
 
-// Funcion que finaliza el publicador, se añadio para poder finalizar un publicador
+
+/**
+ * Function: end
+ * Parameters: None
+ * Returns: None
+ * Description: It sends a message to the server to tell it to close the file descriptor
+ */
 void end()
 {
     remove("delete-line.tmp");
@@ -39,7 +68,18 @@ void end()
     exit(0);
 }
 
-// Funcion que elimina una linea de un archivo y guarda el contenido en otro, se añadio para poder eliminar una linea de un archivo al leer de este
+
+/**
+ * Function: deleteLine 
+ *
+ * Parameters: srcFile The file you want to delete a line from.
+ *           tempFile The temporary file that will be used to store the contents of the source file, minus the 
+ *           line that is to be deleted.
+ *           line The line number to delete.
+ * Returns: None
+ * Description: It reads the source file line by line, and writes the lines to the temporary file, except for the
+                  line to be deleted
+ */
 void deleteLine(FILE *srcFile, FILE *tempFile, const int line)
 {
     const int BUFFER_SIZE = 1024;
@@ -52,7 +92,14 @@ void deleteLine(FILE *srcFile, FILE *tempFile, const int line)
     }
 }
 
-// Funcion que inicializa lo relacionado con un publicador, se añadio para poder inicializar un publicador
+/**
+ * Function: startSystem
+ * 
+ * Parameters: argc number of arguments
+ *              argv -p /tmp/fifo -f /tmp/log.txt -t 5
+ * Returns: None
+ * Description: It opens a pipe to the system and if it fails, it will try again after a certain amount of time
+ */
 void startSystem(int argc, char **argv)
 {
     for (int i = 1; i < argc; i += 2)
@@ -77,7 +124,16 @@ void startSystem(int argc, char **argv)
     } while (fd == -1);
 }
 
-// Funcion que crea un articulo y lo envia a un pipe especificado (Otra funcion), se añadio para poder crear un articulo y enviarlo al SC
+
+/**
+ * Function: createArticle
+ * 
+ * Parameters: category The category of the article.
+ *              text The text of the article.
+ * 
+ * Returns: A pointer to a struct NewsArticle.
+ * Description: It creates a new article, writes it to the archive, and then frees the article
+ */
 bool createArticle(char category, char *text)
 {
     struct NewsArticle *article = createNewsArticle(category, text);
@@ -93,7 +149,16 @@ bool createArticle(char category, char *text)
     }
 }
 
-// Funcion que lee articulos de un archivo y los envia a un pipe especificado (Otra función), se añadio para poder leer articulos de un archivo y enviarlos al SC
+
+/**
+ * Function: readArticles
+ * Parameters: None
+ * Returns: None
+ *
+ * Description: 
+ * It reads the first line of a file, creates an article with the information in the line, and then
+ * deletes the line from the file.
+ */
 void readArticles()
 {
     FILE *fd = NULL;
@@ -149,34 +214,66 @@ void readArticles()
     fclose(fd);
 }
 
-// Funcion para capturar una señal y poder finalizar el publicador correctamente, se añadio para poder capturar una señal y finalizar el publicador
+/**
+ * Function: catch_sigint
+ * Parameters: None
+ * Returns: None
+ * Description: It sets up a signal handler for SIGINT (Ctrl-C) that will call the end() function
+ */
 void catch_sigint()
 {
     write(STDOUT_FILENO, "END", 3);
     end();
 }
 
-// Funcion para capturar una señal y poder finalizar el publicador correctamente, se añadio para poder capturar una señal y finalizar el publicador
+
+/**
+ * Function: catch_sigterm
+ * Parameters: None
+ * Return: None
+ * Description:
+ * It sets up a signal handler for SIGTERM, which is the signal sent to a process when it is to be
+ * terminated
+ */
 void catch_sigterm()
 {
     write(STDOUT_FILENO, "TERMINATE", 9);
     end();
 }
 
-// Funcion para capturar una señal de alarma, se añadio para poder capturar una señal de alarma y seguir con la ejecucion del programa
+
+/**
+ *
+ * Function: catch_alarm
+ * Parameters: None
+ * Returns: None 
+ * Description: The function `catch_alarm()` is called when the alarm goes off.
+ */
 void catch_alarm()
 {
     write(STDOUT_FILENO, "ALARM", 5);
 }
 
-// Funcion para leer el archivo eternamente, se añadio para poder leer el archivo
+
+/**
+ * Function: readTrue
+ * Parameters: None
+ * Returns: None 
+ * Description:It reads articles until it reads a true article
+ */
 void readTrue()
 {
     while (true)
         readArticles();
 }
 
-// Funcion para leer la entrada de texto
+
+/**
+ * Function: readSTDIN
+ * Parameters: None
+ * Returns: None 
+ * Description:It reads from stdin and creates an article
+ */
 void readSTDIN()
 {
     int i = 0;
@@ -198,6 +295,15 @@ void readSTDIN()
     }
 }
 
+/**
+ * 
+ * Function: Main
+ * Parameters: argc number of arguments
+ *             argv -p /bin/ls -f /home/user/Documents/file.txt -t 5
+ * 
+ * Return: The return value of the function is the exit status of the child process.
+ * Description: It reads the arguments from the command line and starts the system
+ */
 int main(int argc, char **argv)
 {
     signal(SIGALRM, catch_alarm);
