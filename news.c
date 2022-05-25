@@ -8,22 +8,48 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <pthread.h>
+
+/*
+file: news.c
+Authors: Nicolas Bayona, Manuel Rios, Abril Cano 
+Contains: implementation of functions that creates the structures
+of news that will be sent, managed, created etc
+Date of last update: 24/05/2022
+*/
+
 mode_t fifo_mode = S_IRUSR | S_IWUSR;
-//Estructura de datos que almacena la información de un articulo de noticias
+
+/**
+ * The type NewsArticle is a struct that contains a char and an array of 100 chars.
+ * @property {char} category - The category of the news article.
+ * @property {char} text - The text of the article.
+ */
 typedef struct NewsArticle
 {
     char category;
     char text[100];
 };
 
-//Estructura de datos que almacena la información para envíar un articulo de noticias junto con el PID del proceso que lo envía
+/**
+ * A Message is a struct that contains a pid_t and a NewsArticle.
+ * @property {pid_t} id - The process ID of the process that sent the message.
+ * @property article - The article to be sent.
+ */
 typedef struct Message
 {
     pid_t id;
     struct NewsArticle article;
 };
 
-//Crea un objeto de tipo mensaje a partir de un articulo de noticias y un PID
+
+/**
+ * It creates a message
+ * 
+ * @param id The id of the process that sent the message
+ * @param article The article to be sent.
+ * 
+ * @return A pointer to a struct Message.
+ */
 struct Message *createMessage(pid_t id, struct NewsArticle article)
 {
     struct Message *message = malloc(sizeof(struct Message));
@@ -32,7 +58,15 @@ struct Message *createMessage(pid_t id, struct NewsArticle article)
     return message;
 }
 
-//Crea un objeto de tipo articulo de noticias a partir de una categoria y un texto
+
+/**
+ * It creates a new news article
+ * 
+ * @param category The category of the news article.
+ * @param text The text of the article.
+ * 
+ * @return A pointer to a NewsArticle struct.
+ */
 struct NewsArticle *createNewsArticle(char category, char *text)
 {
     struct NewsArticle *article = malloc(sizeof(struct NewsArticle));

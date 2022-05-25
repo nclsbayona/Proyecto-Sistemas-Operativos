@@ -1,5 +1,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
+
+/*
+file: map.c
+Authors: Nicolas Bayona, Manuel Rios, Abril Cano 
+Contains: implementation of functions that manages
+the map structure of the system
+Date of last update: 24/05/2022
+*/
 // Estructura de datos que almacena las suscripciones a una categoria en el sistema de comunicaciones
 typedef struct Value
 {
@@ -27,7 +35,14 @@ typedef struct Map
     struct Entry **entries;
 };
 
-//Busca una entrada en el mapa de un sistema de comunicaciones por medio de su categoria
+/**
+ * It searches for an entry in a map
+ * 
+ * @param map The map to search in.
+ * @param key The key to search for.
+ * 
+ * @return A pointer to a struct Entry.
+ */
 struct Entry *searchEntryInMap(struct Map *map, const char key)
 {
     struct Entry *entry = NULL;
@@ -37,7 +52,15 @@ struct Entry *searchEntryInMap(struct Map *map, const char key)
     return entry;
 }
 
-//Añade una entrada al mapa de un sistema de comunicaciones
+
+/**
+ * It adds an entry to a map
+ * 
+ * @param map The map to add the entry to.
+ * @param entry The entry to add to the map.
+ * 
+ * @return A pointer to a struct Map.
+ */
 bool addEntryToMap(struct Map *map, struct Entry *entry)
 {
     bool r = true;
@@ -49,7 +72,14 @@ bool addEntryToMap(struct Map *map, struct Entry *entry)
     return r;
 }
 
-//Crea una objeto de tipo entrada a partir de una categoria y sus suscripciones para añadirla al sistema de comunicaciones
+/**
+ * It creates an entry
+ * 
+ * @param key The key of the entry.
+ * @param value The value to be stored in the entry.
+ * 
+ * @return A pointer to a struct Entry.
+ */
 struct Entry *createEntry(char key, struct Value *value)
 {
     struct Entry *entry = malloc(sizeof(struct Entry));
@@ -59,7 +89,14 @@ struct Entry *createEntry(char key, struct Value *value)
     return entry;
 }
 
-//Añade un archivo a la lista de suscripciones de una categoria especifica en el mapa de un sistema de comunicaciones
+/**
+ * It takes a map, a key, and a filename, and adds the filename to the list of filenames associated
+ * with the key
+ * 
+ * @param map The map to add the entry to
+ * @param key the key to search for
+ * @param filename The name of the file to be subscribed to.
+ */
 void subscribeToEntry(struct Map *map, char key, char *filename)
 {
     struct Entry *entry = searchEntryInMap(map, key);
@@ -83,7 +120,12 @@ void subscribeToEntry(struct Map *map, char key, char *filename)
     entry->value->filenames[entry->value->len - 1] = filename;
 }
 
-//Inicializa un mapa
+
+/**
+ * It creates a map and returns a pointer to it.
+ * 
+ * @return A pointer to a Map struct.
+ */
 struct Map *createMap()
 {
     struct Map *map = (struct Map *)malloc(sizeof(struct Map));
@@ -91,6 +133,9 @@ struct Map *createMap()
     map->entries = NULL;
     return map;
 }
+
+
+
 /*
 void printMap(struct Map *map)
 {
