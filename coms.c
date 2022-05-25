@@ -4,16 +4,17 @@
 /**
  * `struct CommunicationSystem` is a struct that contains a `struct Map *`, a `struct NewsArticle **`,
  * a `pid_t *`, an `int`, a `pid_t *`, an `int`, and an `int`.
- * @property writingPipes - This is a map that contains the pipes that the process should write to. The
+ * Properties:
+ * writingPipes - This is a map that contains the pipes that the process should write to. The
  * key is the category and the value is an array of pipes.
- * @property articles - This is an array of NewsArticle pointers. This is where the articles are
+ * articles - This is an array of NewsArticle pointers. This is where the articles are
  * stored.
- * @property {pid_t} ids - This is an array of the ids of the processes that are subscribed to the
+ * {pid_t} ids - This is an array of the ids of the processes that are subscribed to the
  * communication system.
- * @property {int} len - The length of the array of articles.
- * @property {pid_t} idsP - The array of ids of the publishers.
- * @property {int} size_idsP - The length of the array of idsP.
- * @property {int} size_ids - The length of the array of ids.
+ * {int} len - The length of the array of articles.
+ * {pid_t} idsP - The array of ids of the publishers.
+ * {int} size_idsP - The length of the array of idsP.
+ * {int} size_ids - The length of the array of ids.
  */
 typedef struct CommunicationSystem
 {
@@ -28,12 +29,11 @@ typedef struct CommunicationSystem
 
 // Busca un id en el array de ids de un sistema de comunicaciones
 /**
- * It checks if the pid is in the list of ids
+ * Function: idFound
+ * Description: It checks if the pid is in the list of ids
+ * Parameter: cs The communication system, pid the process id of the process that sent the message
+ * Returns: A boolean value that represents the success of the search 
  * 
- * @param cs The communication system
- * @param pid the process id of the process that sent the message
- * 
- * @return A boolean value.
  */
 bool idFound(struct CommunicationSystem *cs, pid_t pid)
 {
@@ -45,12 +45,10 @@ bool idFound(struct CommunicationSystem *cs, pid_t pid)
 
 // Busca un id en el array de idsP de un sistema de comunicaciones
 /**
- * It checks if a given pid is in the list of pids
- * 
- * @param cs The communication system
- * @param pid the process id of the process that sent the message
- * 
- * @return A boolean value.
+ * Function: idPFound
+ * Description: It checks if a given pid is in the list of pids
+ * Parameters: cs The communication system, pid the process id of the process that sent the message
+ * Returns: A boolean value that represents the success of the search
  */
 bool idPFound(struct CommunicationSystem *cs, pid_t pid)
 {
@@ -62,12 +60,10 @@ bool idPFound(struct CommunicationSystem *cs, pid_t pid)
 
 // Quita un id en el array de idsP de un sistema de comunicaciones
 /**
- * It removes a pid from the list of pids
- * 
- * @param cs the CommunicationSystem struct
- * @param pid the process id of the process to be removed
- * 
- * @return true if the pid was found and removed, false otherwise.
+ * Function: removeidP
+ * Description: It removes a pid from the list of pids
+ * Parameters: cs the CommunicationSystem struct, pid the process id of the process to be removed
+ * Returns:true if the pid was found and removed, false otherwise.
  */
 bool removeidP(struct CommunicationSystem *cs, pid_t pid)
 {
@@ -85,12 +81,10 @@ bool removeidP(struct CommunicationSystem *cs, pid_t pid)
 
 // Busca un articulo en el array de articulos de un sistema de comunicaciones
 /**
- * It checks if the article is already in the system
- * 
- * @param cs The communication system
- * @param article The article to check for.
- * 
- * @return A boolean value.
+ * Function: artFound
+ * Description: It checks if the article is already in the system
+ * Parameters: cs The communication system, article The article to check for.
+ * Returns: A boolean value.
  */
 bool artFound(struct CommunicationSystem *cs, struct NewsArticle *article)
 {
@@ -102,12 +96,10 @@ bool artFound(struct CommunicationSystem *cs, struct NewsArticle *article)
 
 // Añade un id al array de ids de un sistema de comunicaciones
 /**
- * It adds a new id to the list of ids
- * 
- * @param cs The communication system
- * @param id The id of the process to add to the list of processes to communicate with.
- * 
- * @return A boolean value.
+ * Function: addId
+ * Description: It adds a new id to the list of ids
+ * Parameters: cs The communication system, id The id of the process to add to the list of processes to communicate with.
+ * Returns: A boolean value.
  */
 bool addId(struct CommunicationSystem *cs, pid_t id)
 {
@@ -121,12 +113,10 @@ bool addId(struct CommunicationSystem *cs, pid_t id)
 
 // Añade un id al array de idsP de un sistema de comunicaciones
 /**
- * It adds a process id to the list of process ids
- * 
- * @param cs The CommunicationSystem struct
- * @param id The id of the process to add to the list of processes.
- * 
- * @return a boolean value.
+ * Function: addIdP
+ * Description: It adds a process id to the list of process ids
+ * Parameters: cs The CommunicationSystem struct, id The id of the process to add to the list of processes.
+ * Returns: a boolean value.
  */
 bool addIdP(struct CommunicationSystem *cs, pid_t id)
 {
@@ -140,9 +130,10 @@ bool addIdP(struct CommunicationSystem *cs, pid_t id)
 
 // Inicializa un sistema de comunicaciones
 /**
- * It creates a communication system
- * 
- * @return A pointer to a CommunicationSystem struct.
+ * Function: createCommunicationSystem
+ * Description: It creates a communication system
+ * Parameters: none
+ * Return: A pointer to a CommunicationSystem struct.
  */
 struct CommunicationSystem *createCommunicationSystem()
 {
@@ -157,12 +148,11 @@ struct CommunicationSystem *createCommunicationSystem()
 
 // Añade un articulo al array de articulos de un sistema de comunicaciones
 /**
- * It creates a new news article, adds it to the array of articles, and increases the length of the
+ * Function: addNewsArticle
+ * Description: It creates a new news article, adds it to the array of articles, and increases the length of the
  * array
- * 
- * @param cs A pointer to the CommunicationSystem struct.
- * @param category The category of the news article.
- * @param text The text of the article.
+ * Parameters: cs A pointer to the CommunicationSystem struct. category The category of the news article. text The text of the article.
+ * Returns: none
  */
 void addNewsArticle(struct CommunicationSystem *cs, char category, char *text)
 {
@@ -176,11 +166,10 @@ void addNewsArticle(struct CommunicationSystem *cs, char category, char *text)
 
 // Suscribe a un proceso a un topico en especifico, añade el pipe de este a la lista de pipes de escritura para una categoria de un sistema de comunicaciones
 /**
- * It subscribes a process to a topic
- * 
- * @param cs The communication system
- * @param key The key that the client will use to send messages to the server.
- * @param filename The name of the file to write to.
+ * Function: subscribeToTopic
+ * Description: It subscribes a process to a topic
+ * Parameters: cs The communication system. key The key that the client will use to send messages to the server. filename The name of the file to write to.
+ * Returns: none
  */
 void subscribeToTopic(struct CommunicationSystem *cs, char key, char *filename)
 {
@@ -189,13 +178,11 @@ void subscribeToTopic(struct CommunicationSystem *cs, char key, char *filename)
 
 // Envia un articulo a un suscriptor (Al pipe de este)
 /**
- * It opens the pipe with the given filename, writes the article to it, and returns true if it was
+ * Function: sendToSub
+ * Description: It opens the pipe with the given filename, writes the article to it, and returns true if it was
  * successful
- * 
- * @param art The article to send.
- * @param filename The name of the pipe to send the article to.
- * 
- * @return A boolean value.
+ * Parameters: art The article to send. filename The name of the pipe to send the article to.
+ * Returns A boolean value.
  */
 bool sendToSub(struct NewsArticle *art, char *filename)
 {
@@ -211,10 +198,10 @@ bool sendToSub(struct NewsArticle *art, char *filename)
 
 // Envia una noticia a todos los suscriptores de una categoria de articulo
 /**
- * It sends the article to all the subscribers of the category
- * 
- * @param article The article to send to the subscribers.
- * @param cs The communication system
+ * Function: sendToSubs
+ * Description: It sends the article to all the subscribers of the category
+ * Parameters: article The article to send to the subscribers. cs The communication system
+ * Returns: none
  */
 void sendToSubs(struct NewsArticle *article, struct CommunicationSystem *cs)
 {
@@ -226,11 +213,11 @@ void sendToSubs(struct NewsArticle *article, struct CommunicationSystem *cs)
 
 // Envia una noticia a todos los suscriptores
 /**
- * It iterates through all the entries in the writingPipes hashtable, and for each entry, it iterates
+ * Function: sendToAll
+ * Description: It iterates through all the entries in the writingPipes hashtable, and for each entry, it iterates
  * through all the filenames in the entry's value, and sends the article to each of those filenames
- * 
- * @param article The article to send
- * @param cs The communication system
+ * Parameters: article The article to send, cs The communication system
+ * Returns: none
  */
 void sendToAll(struct NewsArticle *article, struct CommunicationSystem *cs)
 {

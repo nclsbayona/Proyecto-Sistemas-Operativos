@@ -1,3 +1,11 @@
+/*
+file: system.c
+Authors: Nicolas Bayona, Manuel Rios, Abril Cano 
+Contains: implementation of functions of the central system in a 
+Publisher-Subscriber system
+Date of last update: 24/05/2022
+*/
+
 #include "coms.c"
 #include "subscribe.c"
 #include <semaphore.h>
@@ -13,9 +21,13 @@ struct CommunicationSystem *cs;
 sem_t s;
 
 // Funcion que finaliza el SC, se añadio para que el SC finalize correctamente
-/**
- * It kills all the processes that are still alive
- */
+/*
+  Function: end
+  Paremeters: none
+  Returns: none
+  Description: It kills all the processes that are still alive
+*/
+
 void end()
 {
     unlink(with_publishers);
@@ -29,12 +41,12 @@ void end()
 }
 
 // Funcion para inicializar el SC, se añadio para poder inicializar el SC
-/**
- * It creates the two pipes that will be used to communicate with the publishers and the subscriptors,
- * and it opens the pipe that will be used to communicate with the publishers
- * 
- * @param argc The number of arguments passed to the program.
- * @param argv the arguments passed to the program
+/*
+ Function: startSystem
+ Parameters: integer that represents number of arguments from main, pointer to pointer of chars that contarins the parameters
+ Returns: none
+ Description: It creates the two pipes that will be used to communicate with the publishers and the subscriptors,
+ and it opens the pipe that will be used to communicate with the publishers
  */
 void startSystem(int argc, char **argv)
 {
@@ -90,10 +102,12 @@ void startSystem(int argc, char **argv)
 }
 
 // Funcion que envia un articulo a los suscriptores, se añadio para enviar un articulo a suscriptores
-/**
- * It sends the article to all the subscribers in the cs list
- * 
- * @param article The article to send to subscribers.
+/*
+ Function: sendArticle
+ Parameters: The article to send to subscribers.
+ Returns: none
+ Description: It sends the article to all the subscribers in the cs list
+ 
  */
 void sendArticle(struct NewsArticle *article)
 {
@@ -101,9 +115,11 @@ void sendArticle(struct NewsArticle *article)
 }
 
 // Funcion que lee un articulo, se añadio para leer un articulo
-//TODO send multiple articles
 /**
- * It reads a message from the pipe, checks if the process that sent the message is registered in the
+ * Function: readArticle
+ * Parameters: none
+ * Returns: none
+ * Description: It reads a message from the pipe, checks if the process that sent the message is registered in the
  * list of processes, if it is not, it adds it to the list, then it checks if the article is already in
  * the list of articles, if it is not, it checks if the category is 0, if it is, it removes the process
  * from the list of processes, if the list of processes is empty, it waits for a certain amount of
@@ -150,11 +166,10 @@ void readArticle()
 // Funcion que envia los articulos previamente escritos a los suscriptores, se añadio para enviar los articulos previamente escritos
 
 /**
- * It sends all the articles that have the same category as the key to the subscriber
- * 
- * @param cs The CommunicationSystem struct.
- * @param key The category of the article.
- * @param filename The name of the file to which the article is to be sent.
+ * Function: sendPreviousArticles
+ * Parameters: cs The CommunicationSystem struct. key The category of the article. filename The name of the file to which the article is to be sent.
+ * Returns: none
+ * Description: It sends all the articles that have the same category as the key to the subscriber
  */
 void sendPreviousArticles(struct CommunicationSystem *cs, char key, char *filename){
     sem_wait(&s);
@@ -169,7 +184,13 @@ void sendPreviousArticles(struct CommunicationSystem *cs, char key, char *filena
 }
 
 // Funcion que lee suscripciones permanentemente, se añadio para leer suscripciones permanentemente
-/* It's a function that listens for subscriptors and adds them to the list of subscriptors. */
+/**
+ * Function: listenForSubscriptors
+ * Parameters: none
+ * Returns: none
+ * Description: It opens a pipe, reads a struct from it, and if the struct is valid, it adds the pid to a list of
+ * pids and subscribes the pid to the categories in the struct
+ */
 void listenForSubscriptors()
 {
     do
@@ -201,8 +222,12 @@ void listenForSubscriptors()
 }
 
 // Funcion para leer articulos permanentemente, se añadio para leer articulos permanentemente
+
 /**
- * It writes "END" to the standard output and then calls the end() function
+ * Function: readTrue
+ * Paramenters: none
+ * Returns: none
+ * Description: It reads articles permanently
  */
 void readTrue()
 {
@@ -212,7 +237,10 @@ void readTrue()
 
 // Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
 /**
- * It writes "END" to the standard output and then calls the end() function
+ * Function: catch_sigint
+ * Paramenters: none
+ * Returns: none
+ * Description: init signal handler, captures a signal that allows the central system to end correctly
  */
 void catch_sigint()
 {
@@ -222,7 +250,10 @@ void catch_sigint()
 
 // Funcion para capturar una señal y poder finalizar el SC correctamente, se añadio para poder capturar una señal y finalizar el SC
 /**
- * It writes "TERMINATE" to the standard output and then calls the end() function
+ * Function: catch_sigint
+ * Paramenters: none
+ * Returns: none
+ * Description: term signal handler, captures a signal that allows the central system to end correctly
  */
 void catch_sigterm()
 {
@@ -231,12 +262,10 @@ void catch_sigterm()
 }
 
 /**
- * It's a function that reads the arguments and starts the system
- * 
- * @param argc The number of arguments passed to the program.
- * @param argv 
- * 
- * @return The return value of the function is the exit status of the program.
+ * Function: main
+ * Parameters: argc The number of arguments passed to the program, argv the arguments necesary to run the program 
+ * Returns: the return value of the function is the exit status of the program.
+ * Description: It's a function that reads the arguments and starts the system
  */
 int main(int argc, char **argv)
 {
