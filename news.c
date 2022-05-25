@@ -43,12 +43,12 @@ typedef struct Message
 
 
 /**
- * It creates a message
+ * Function createMessage
+ * Parameters: id The id of the process that sent the message
+ *           article The article to be sent.
  * 
- * @param id The id of the process that sent the message
- * @param article The article to be sent.
- * 
- * @return A pointer to a struct Message.
+ * Returns: A pointer to a struct Message.
+ * Description: It creates a message
  */
 struct Message *createMessage(pid_t id, struct NewsArticle article)
 {
@@ -60,12 +60,13 @@ struct Message *createMessage(pid_t id, struct NewsArticle article)
 
 
 /**
- * It creates a new news article
+ * Function: createNewsArticle
  * 
- * @param category The category of the news article.
- * @param text The text of the article.
+ * Parameters: category The category of the news article.
+ *           text The text of the article.
  * 
- * @return A pointer to a NewsArticle struct.
+ * Returns: A pointer to a NewsArticle struct.
+ * Description: It creates a new news article
  */
 struct NewsArticle *createNewsArticle(char category, char *text)
 {

@@ -15,13 +15,21 @@ typedef struct Value
     char **filenames;
 };
 
-// Estructura de datos que almacena la información de una categoria en el sistema de comunicaciones
+/**
+ * A Key is a struct that contains a char.
+ * @property {char} key - The key that the user pressed.
+ */
 typedef struct Key
 {
     char key;
 };
 
 // Estructura de datos que almacena la información completa de una entrada en el sistema de comunicaciones (Llave y valor), es decir, una categoria y sus suscripciones en este caso
+/**
+ * An Entry is a struct that contains a pointer to a Key and a pointer to a Value.
+ * @property key - The key of the entry.
+ * @property value - The value of the entry.
+ */
 typedef struct Entry
 {
     struct Key *key;
@@ -36,13 +44,13 @@ typedef struct Map
 };
 
 /**
- * It searches for an entry in a map
- * 
- * @param map The map to search in.
- * @param key The key to search for.
- * 
- * @return A pointer to a struct Entry.
+ * Function: searchEntryInMap
+ * Parameters: map The map to search in.
+ *              key The key to search for.
+ * Returns: A pointer to a struct Entry.
+ * Description: It searches for an entry in a map
  */
+ 
 struct Entry *searchEntryInMap(struct Map *map, const char key)
 {
     struct Entry *entry = NULL;
@@ -54,12 +62,12 @@ struct Entry *searchEntryInMap(struct Map *map, const char key)
 
 
 /**
- * It adds an entry to a map
+ * Function: addEntryToMap
+ * Parameters: map The map to add the entry to.
+ *       entry The entry to add to the map.
  * 
- * @param map The map to add the entry to.
- * @param entry The entry to add to the map.
- * 
- * @return A pointer to a struct Map.
+ * Returns: A pointer to a struct Map.
+ * Description: It adds an entry to a map
  */
 bool addEntryToMap(struct Map *map, struct Entry *entry)
 {
@@ -73,12 +81,12 @@ bool addEntryToMap(struct Map *map, struct Entry *entry)
 }
 
 /**
- * It creates an entry
+ * Function: createEntry
+ * Parameters: key The key of the entry.
+ *          value The value to be stored in the entry.
  * 
- * @param key The key of the entry.
- * @param value The value to be stored in the entry.
- * 
- * @return A pointer to a struct Entry.
+ * Returns: A pointer to a struct Entry.
+ * Description: It creates an entry
  */
 struct Entry *createEntry(char key, struct Value *value)
 {
@@ -90,12 +98,13 @@ struct Entry *createEntry(char key, struct Value *value)
 }
 
 /**
- * It takes a map, a key, and a filename, and adds the filename to the list of filenames associated
- * with the key
- * 
- * @param map The map to add the entry to
- * @param key the key to search for
- * @param filename The name of the file to be subscribed to.
+ * Function subscribetoEntry
+ * Parameters: map The map to add the entry to
+ *              key the key to search for
+ *              filename The name of the file to be subscribed to.
+ * Returns: None
+ * Description: It takes a map, a key, and a filename, and adds the filename to the 
+ *              list of filenames associated with the key
  */
 void subscribeToEntry(struct Map *map, char key, char *filename)
 {
@@ -122,9 +131,10 @@ void subscribeToEntry(struct Map *map, char key, char *filename)
 
 
 /**
- * It creates a map and returns a pointer to it.
- * 
- * @return A pointer to a Map struct.
+ * Function: createMap
+ * Parameters: None
+ * Returns: A pointer to a Map struct.
+ * Description: It creates a map and returns a pointer to it.
  */
 struct Map *createMap()
 {
